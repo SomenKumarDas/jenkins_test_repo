@@ -1,25 +1,65 @@
 pipeline {
     agent any
+    options {
+        // Ensure that old builds are kept if there are changes to track.
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    environment {
+        // You can set environment variables if needed
+        GIT_BRANCH = 'main'  // Replace with your branch name
+    }
     stages {
         stage('Checkout') {
             steps {
+                // Checkout the code
                 checkout scm
-                echo 'Checking out...'
             }
         }
-        stage('Build') {
+        stage('Check Changes') {
             steps {
-                echo 'Building...'
+                script {
+                    // Get the current change log
+                    def changeLogSets = currentBuild.changeSets
+                    def hasChanges = false
+
+                    for (int i = 0; i < changeLogSets.size(); i++) {
+                        def entries = changeLogSets[i].items
+                        if (entries.length > 0) {
+                            hasChanges = true
+                            break
+                        }
+                    }
+
+                    if (hasChanges) {
+                        echo 'There are changes in the branch since the last build.'
+                        currentBuild.result = 'SUCCESS'
+                    } else {
+                        echo 'No changes detected in the branch since the last build.'
+                        currentBuild.result = 'NOT_BUILT'
+                    }
+                }
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying...'
+    }
+    post {
+        always {
+            script {
+                // Display a summary of the changes, if any
+                def changeLogSets = currentBuild.changeSets
+                for (int i = 0; i < changeLogSets.size(); i++) {
+                    def entries = changeLogSets[i].items
+                    for (int j = 0; j < entries.length; j++) {
+                        def entry = entries[j]
+                        echo "Commit ${entry.commitId}: ${entry.msg}"
+                        echo "Author: ${entry.author.fullName}"
+                        echo "Date: ${new Date(entry.timestamp)}"
+                        echo "Affected files:"
+                        for (int k = 0; k < entry.affectedFiles.size(); k++) {
+                            def affectedFile = entry.affectedFiles[k]
+                            echo "  ${affectedFile.editType.name} ${affectedFile.path}"
+                        }
+                    }
+                }
             }
         }
     }
