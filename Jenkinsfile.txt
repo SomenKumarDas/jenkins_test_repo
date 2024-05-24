@@ -32,9 +32,25 @@ pipeline {
 
                     if (hasChanges) {
                         echo 'There are changes in the branch since the last build.'
-                        currentBuild.result = 'SUCCESS'
+                        // currentBuild.result = 'SUCCESS'
                     } else {
                         echo 'No changes detected in the branch since the last build.'
+                        // currentBuild.result = 'NOT_BUILT'
+                    }
+                }
+            }
+        }
+        stage('Check Changes 2') {
+            steps {
+                script {
+                    // Get the current change log
+                    def changeLogSets = currentBuild.changeSets
+
+                    if (changeLogSets.isEmptySet()) {
+                        echo 'DEBUG: No change'
+                        currentBuild.result = 'SUCCESS'
+                    } else {
+                        echo 'DEBUG: Change Found'
                         currentBuild.result = 'NOT_BUILT'
                     }
                 }
