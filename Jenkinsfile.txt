@@ -46,7 +46,7 @@ pipeline {
                     // Get the current change log
                     def changeLogSets = currentBuild.changeSets
 
-                    if (changeLogSets.isEmptySet()) {
+                    if (changeLogSets.isEmpty()) {
                         echo 'DEBUG: No change'
                         currentBuild.result = 'SUCCESS'
                     } else {
