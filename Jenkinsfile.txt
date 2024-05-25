@@ -1,13 +1,5 @@
 pipeline {
     agent any
-    // options {
-    //     // Ensure that old builds are kept if there are changes to track.
-    //     buildDiscarder(logRotator(numToKeepStr: '10'))
-    // }
-    // environment {
-    //     // You can set environment variables if needed
-    //     GIT_BRANCH = 'main'  // Replace with your branch name
-    // }
     triggers {
         cron('H/5 * * * *')
     }
@@ -23,31 +15,6 @@ pipeline {
                 script {
                     // Get the current change log
                     def changeLogSets = currentBuild.changeSets
-                    def hasChanges = false
-
-                    for (int i = 0; i < changeLogSets.size(); i++) {
-                        def entries = changeLogSets[i].items
-                        if (entries.length > 0) {
-                            hasChanges = true
-                            break
-                        }
-                    }
-
-                    if (hasChanges) {
-                        echo 'There are changes in the branch since the last build.'
-                        // currentBuild.result = 'SUCCESS'
-                    } else {
-                        echo 'No changes detected in the branch since the last build.'
-                        // currentBuild.result = 'NOT_BUILT'
-                    }
-                }
-            }
-        }
-        stage('Check Changes 2') {
-            steps {
-                script {
-                    // Get the current change log
-                    def changeLogSets = currentBuild.changeSets
 
                     if (changeLogSets.isEmpty()) {
                         echo 'DEBUG: No change'
@@ -58,6 +25,20 @@ pipeline {
                     }
                 }
             }
+        }
+        stage('Build') {
+            bat """
+            cd jenkins_test_repo
+            gcc test_code.c
+            echo "Build is complete"
+            """
+        }
+        stage('Execute') {
+            bat """
+            cd jenkins_test_repo
+            call a.exe
+            echo "Executing is complete"
+            """
         }
     }
     post {
