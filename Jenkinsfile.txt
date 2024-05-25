@@ -17,11 +17,11 @@ pipeline {
                     def changeLogSets = currentBuild.changeSets
 
                     if (changeLogSets.isEmpty()) {
-                        echo 'DEBUG: No change'
-                        currentBuild.result = 'SUCCESS'
+                        echo 'DEBUG: No change Abort the build'
+                        currentBuild.result = 'ABORTED'
                     } else {
-                        echo 'DEBUG: Change Found'
-                        currentBuild.result = 'NOT_BUILT'
+                        echo 'DEBUG: Change Found continue the build'
+                        // currentBuild.result = 'SUCCESS'
                     }
                 }
             }
