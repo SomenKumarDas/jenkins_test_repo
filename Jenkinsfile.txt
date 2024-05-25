@@ -1,12 +1,15 @@
 pipeline {
     agent any
-    options {
-        // Ensure that old builds are kept if there are changes to track.
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-    }
-    environment {
-        // You can set environment variables if needed
-        GIT_BRANCH = 'main'  // Replace with your branch name
+    // options {
+    //     // Ensure that old builds are kept if there are changes to track.
+    //     buildDiscarder(logRotator(numToKeepStr: '10'))
+    // }
+    // environment {
+    //     // You can set environment variables if needed
+    //     GIT_BRANCH = 'main'  // Replace with your branch name
+    // }
+    triggers {
+        cron('H/5 * * * *')
     }
     stages {
         stage('Checkout') {
