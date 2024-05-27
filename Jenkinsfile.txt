@@ -20,6 +20,7 @@ pipeline {
                         echo 'DEBUG: No change Abort the build'
                         currentBuild.result = 'ABORTED'
                         // error('Aborting build due to no changes detected.')
+                        env.SKIP_REMAINING_STAGES = true
                         return
                     } else {
                         echo 'DEBUG: Change Found continue the build'
@@ -29,6 +30,9 @@ pipeline {
             }
         }
         stage('Build') {
+            when {
+                expression { env.SKIP_REMAINING_STAGES != 'true' }
+            }
             steps {
                 script {
                     bat """
@@ -40,6 +44,9 @@ pipeline {
             }
         }
         stage('Execute') {
+            when {
+                expression { env.SKIP_REMAINING_STAGES != 'true' }
+            }
             steps {
                 script {
                     bat """
