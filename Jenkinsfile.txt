@@ -19,7 +19,8 @@ pipeline {
                     if (changeLogSets.isEmpty()) {
                         echo 'DEBUG: No change Abort the build'
                         currentBuild.result = 'ABORTED'
-                        error('Aborting build due to no changes detected.')
+                        // error('Aborting build due to no changes detected.')
+                        return
                     } else {
                         echo 'DEBUG: Change Found continue the build'
                         // currentBuild.result = 'SUCCESS'
