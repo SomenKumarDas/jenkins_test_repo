@@ -18,7 +18,7 @@ pipeline {
                     def changeLogSets = currentBuild.changeSets
 
                     def previousBuild = currentBuild.previousBuild
-                    def previousBuildFailed = previousBuild != null && (previousBuild.result != 'SUCCESS' || previousBuild.result != 'ABORTED')
+                    def previousBuildFailed = previousBuild != null && previousBuild.result == 'FAILURE'
 
                     if(previousBuildFailed) {
                         echo 'DEBUG: Previous Build failed. Execution continue'
