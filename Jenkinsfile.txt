@@ -31,7 +31,9 @@ pipeline {
         }
         stage('Build') {
             when {
-                expression { env.SKIP_REMAINING_STAGES != 'true' }
+                allof {
+                    expression { env.SKIP_REMAINING_STAGES != 'true' }
+                }
             }
             steps {
                 script {
