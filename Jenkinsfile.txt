@@ -13,19 +13,27 @@ pipeline {
         stage('Check Changes') {
             steps {
                 script {
-                    // Get the current change log
+
+                    env.SKIP_REMAINING_STAGES = 'false'
                     def changeLogSets = currentBuild.changeSets
 
-                    if (changeLogSets.isEmpty()) {
+                    def previousBuild = currentBuild.previousBuild
+                    def previousBuildFailed = previousBuild != null 
+                                                && (previousBuild.result != 'SUCCESS' 
+                                                || previousBuild.result != 'ABORTED')
+
+                    if(previousBuildFailed) {
+                        echo 'DEBUG: Previous Build failed. Execution continue'
+                    } else if (changeLogSets.isEmpty()) {
                         echo 'DEBUG: No change Abort the build'
                         currentBuild.result = 'ABORTED'
-                        // error('Aborting build due to no changes detected.')
-                        env.SKIP_REMAINING_STAGES = true
+                        env.SKIP_REMAINING_STAGES = 'true'
                         return
                     } else {
                         echo 'DEBUG: Change Found continue the build'
-                        // currentBuild.result = 'SUCCESS'
                     }
+
+
                 }
             }
         }
